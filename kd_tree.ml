@@ -24,7 +24,7 @@ module Make = functor (P: Point) -> struct
     else if x > y then 1
     else 0 (* x = y *)
 
-  (* the array is correctly sorted after *)
+  (* Bonus: the array is correctly sorted after! *)
   let median get_coord a =
     A.sort (fun p1 p2 -> fcmp (get_coord p1) (get_coord p2)) a;
     let n = A.length a in
@@ -33,7 +33,7 @@ module Make = functor (P: Point) -> struct
 
   exception Finished of int
   (* count how many times [p] is true from the left,
-     stop counting as soon as it is false *)
+     abort as soon as it is false *)
   let left_count p a =
     let n = A.length a in
     try
@@ -41,8 +41,8 @@ module Make = functor (P: Point) -> struct
         if not (p (A.unsafe_get a i)) then
           raise (Finished i)
       done;
-      n
-    with Finished i -> i
+      n (* all OK *)
+    with Finished i -> i (* some KO *)
 
   let partition ok_count a =
     let n = A.length a in
@@ -58,7 +58,7 @@ module Make = functor (P: Point) -> struct
       else
         let dim = depth mod P.ndims in
         let med = median (P.get_coord dim) points in
-        let ok_count = left_count (fun p -> P.get_coord dim <= med) points in
+        let ok_count = left_count (fun p -> P.get_coord dim p <= med) points in
         let left, right = partition ok_count points in
         let depth' = depth + 1 in
         Node (loop depth' left, med, loop depth' right)
@@ -79,13 +79,23 @@ module Make = functor (P: Point) -> struct
     | Empty -> true
     | _ -> false
 
+  (* test if the tree invariant holds. If it doesn't, we are in trouble... *)
+  let check t =
+    let rec loop depth = function
+      | Empty -> true
+      | Leaf _ -> true
+      | Node (left, med, right) ->
+        let lefties = to_list left in
+        let righties = to_list right in
+        let dim = depth mod P.ndims in
+        let depth' = depth + 1 in
+        A.for_all (fun p -> P.get_coord dim p <= med) lefties &&
+        A.for_all (fun p -> P.get_coord dim p > med) righties &&
+        loop depth' left && loop depth' right in
+    loop 0 t
+
   (* return all points whose coordinates are inside [range] *)
   let search range tree =
-    failwith "not implemented yet"
-
-  (* test if the tree invariant holds.
-     If it doesn't, we are in trouble... *)
-  let rec check =
     failwith "not implemented yet"
 
 end
