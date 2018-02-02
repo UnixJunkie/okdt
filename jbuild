@@ -1,0 +1,10 @@
+(jbuild_version 1)
+
+(library
+ ((name        kdt)
+  (public_name kdt)
+  (modules (Kd_tree))))
+
+(executables
+ ((names     (test))
+  (libraries (unix dolog minicli))))
