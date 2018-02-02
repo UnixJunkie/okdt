@@ -89,12 +89,13 @@ module Make = functor (P: Point) -> struct
         let righties = to_list right in
         let dim = depth mod P.ndims in
         let depth' = depth + 1 in
-        A.for_all (fun p -> P.get_coord dim p <= med) lefties &&
-        A.for_all (fun p -> P.get_coord dim p > med) righties &&
+        L.for_all (fun p -> P.get_coord dim p <= med) lefties &&
+        L.for_all (fun p -> P.get_coord dim p > med) righties &&
         loop depth' left && loop depth' right in
     loop 0 t
 
-  (* return all points whose coordinates are inside [range] *)
+  (* "orthogonal range query": return all points whose coordinates
+     are inside [range] *)
   let search range tree =
     failwith "not implemented yet"
 
